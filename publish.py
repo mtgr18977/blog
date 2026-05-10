@@ -98,7 +98,8 @@ def extract_date_from_body(body: str) -> str | None:
     if not match:
         return None
     raw = match.group(1).strip()
-    for fmt in ("%d %B, %Y", "%d %B %Y", "%B %d, %Y", "%B %d %Y"):
+    for fmt in ("%d %b, %Y", "%d %b %Y", "%b %d, %Y", "%b %d %Y",
+                "%d %B, %Y", "%d %B %Y", "%B %d, %Y", "%B %d %Y"):
         try:
             return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
         except ValueError:
@@ -1061,6 +1062,52 @@ def cmd_publish(source: Path, cfg: dict, no_index: bool = False):
         print(f"\n✓ Published → {cfg['base_url']}{slug}/")
 
 
+def _ascii_slug(s: str) -> str:
+    import unicodedata
+    s = unicodedata.normalize("NFD", s)
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    return s.lower()
+
+
+def cmd_fix_dates():
+    posts = load_registry()
+    scan_dirs = [Path("posts_antigos"), Path("posts_novos")]
+
+    # build lookup: exact stem + ascii-normalized stem → file
+    slug_to_file: dict[str, Path] = {}
+    for d in scan_dirs:
+        if d.exists():
+            for f in d.glob("*.md"):
+                slug_to_file[f.stem] = f
+                slug_to_file[_ascii_slug(f.stem)] = f
+
+    fixed = 0
+    for post in posts:
+        slug = post["slug"]
+        md_file = (slug_to_file.get(slug)
+                   or slug_to_file.get(_ascii_slug(slug)))
+        if md_file is None:
+            for d in scan_dirs:
+                candidate = d / f"{slug}.md"
+                if candidate.exists():
+                    md_file = candidate
+                    break
+        if md_file is None:
+            continue
+        raw = md_file.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---\s*\n", raw, re.DOTALL)
+        body = raw[fm_match.end():] if fm_match else raw
+        extracted = extract_date_from_body(body)
+        if extracted and extracted != post["date"]:
+            print(f"  {slug}: {post['date']} → {extracted}")
+            post["date"] = extracted
+            fixed += 1
+
+    posts.sort(key=lambda p: p["date"], reverse=True)
+    save_registry(posts)
+    print(f"\n✓ Fixed {fixed} date(s). Registry saved.")
+
+
 def cmd_rebuild_index(cfg: dict):
     posts = load_registry()
     if not posts:
@@ -1111,6 +1158,7 @@ def main():
     group.add_argument("--rebuild-index", action="store_true", help="Regenerate all index pages")
     group.add_argument("--list", action="store_true", help="List published posts")
     group.add_argument("--delete", metavar="SLUG", help="Delete a post by slug")
+    group.add_argument("--fix-dates", action="store_true", help="Re-read dates from markdown files and update registry")
     parser.add_argument("--no-index", action="store_true", help="Skip index rebuild (use in batch)")
 
     args = parser.parse_args()
@@ -1122,6 +1170,8 @@ def main():
         cmd_rebuild_index(cfg)
     elif args.delete:
         cmd_delete(args.delete, cfg)
+    elif args.fix_dates:
+        cmd_fix_dates()
     elif args.source:
         cmd_publish(args.source, cfg, no_index=args.no_index)
     else:

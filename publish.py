@@ -78,6 +78,10 @@ def parse_markdown(path: Path) -> tuple[dict, str]:
             print(f"Warning: invalid YAML frontmatter — {e}")
         body = raw[fm_match.end():]
 
+    extracted = extract_date_from_body(body)
+    if extracted:
+        frontmatter["date"] = extracted
+
     md = markdown.Markdown(
         extensions=["fenced_code", "codehilite", "tables", "toc", "footnotes", "attr_list"],
         extension_configs={
@@ -86,6 +90,20 @@ def parse_markdown(path: Path) -> tuple[dict, str]:
         },
     )
     return frontmatter, md.convert(body)
+
+
+def extract_date_from_body(body: str) -> str | None:
+    """Extract date from inline patterns like _ 20 May, 2024 _ in the markdown body."""
+    match = re.search(r"_\s*((?:\d{1,2}\s+\w+|\w+\s+\d{1,2}),?\s+\d{4})\s*_", body)
+    if not match:
+        return None
+    raw = match.group(1).strip()
+    for fmt in ("%d %B, %Y", "%d %B %Y", "%B %d, %Y", "%B %d %Y"):
+        try:
+            return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
 
 
 def slugify(text: str) -> str:
@@ -1003,9 +1021,11 @@ def cmd_publish(source: Path, cfg: dict, no_index: bool = False):
     frontmatter, html_body = parse_markdown(source)
     meta = resolve_meta(frontmatter, source)
 
+    _body_date = extract_date_from_body(source.read_text(encoding="utf-8"))
+    date_source = "(from body)" if _body_date else "(from frontmatter)" if frontmatter.get("date") else "(today)"
     print(f"  Title : {meta['title']}")
     print(f"  Slug  : {meta['slug']}")
-    print(f"  Date  : {meta['date']}")
+    print(f"  Date  : {meta['date']}  {date_source}")
     print(f"  Tags  : {', '.join(meta['tags']) or '—'}")
 
     post_html = render_post(meta, html_body, cfg)

@@ -202,6 +202,12 @@ CSS = """
       opacity: 0.8;
     }
 
+    .site-header-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-self: center;
+    }
+
     .site-search-link {
       font-family: var(--font-ui);
       font-size: 0.68rem;
@@ -657,7 +663,10 @@ INDEX_TEMPLATE = """\
       <a href="{root_url}" class="site-name">{site_title}</a>
       {tagline_html}
     </div>
-    <a href="{root_url}search/" class="site-search-link">⌕ Search</a>
+    <div class="site-header-actions">
+      <a href="{root_url}feed.xml" class="site-search-link">⊞ RSS</a>
+      <a href="{root_url}search/" class="site-search-link">⌕ Search</a>
+    </div>
   </header>
 
   <main>

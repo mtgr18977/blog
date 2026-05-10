@@ -603,6 +603,7 @@ POST_TEMPLATE = """\
   <meta name="description" content="{description}" />
   <meta name="author" content="{author}" />
   <link rel="canonical" href="{canonical_url}" />
+  <link rel="alternate" type="application/rss+xml" title="{site_title}" href="{base_url}feed.xml" />
   <style>{css}</style>
 </head>
 <body>
@@ -647,6 +648,7 @@ INDEX_TEMPLATE = """\
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{page_title}</title>
   <meta name="description" content="{site_description}" />
+  <link rel="alternate" type="application/rss+xml" title="{site_title}" href="{root_url}feed.xml" />
   <style>{css}</style>
 </head>
 <body>
@@ -968,6 +970,37 @@ def render_search_page(cfg: dict) -> str:
 </body>
 </html>"""
 
+def render_rss(posts: list[dict], cfg: dict) -> str:
+    from email.utils import format_datetime
+    base = cfg["base_url"]
+    items = []
+    for p in posts:
+        pub_date = format_datetime(datetime.strptime(p["date"], "%Y-%m-%d").replace(tzinfo=timezone.utc))
+        from html import escape
+        items.append(
+            f"  <item>\n"
+            f"    <title>{escape(p['title'])}</title>\n"
+            f"    <link>{base}{p['slug']}/</link>\n"
+            f"    <guid isPermaLink=\"true\">{base}{p['slug']}/</guid>\n"
+            f"    <pubDate>{pub_date}</pubDate>\n"
+            f"    <description>{escape(p.get('description', ''))}</description>\n"
+            f"  </item>"
+        )
+    last_build = format_datetime(datetime.now(timezone.utc))
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+        "<channel>\n"
+        f"  <title>{escape(cfg['site_title'])}</title>\n"
+        f"  <link>{base}</link>\n"
+        f"  <description>{escape(cfg.get('site_description', ''))}</description>\n"
+        f"  <lastBuildDate>{last_build}</lastBuildDate>\n"
+        f'  <atom:link href="{base}feed.xml" rel="self" type="application/rss+xml" />\n'
+        + "\n".join(items)
+        + "\n</channel>\n</rss>\n"
+    )
+
+
 def upload_index(dav: WebDAVClient, posts: list[dict], cfg: dict):
     """Upload all paginated index pages, search.json and search.html to WebDAV."""
     blog_path = cfg["blog_path"].strip("/")
@@ -1007,6 +1040,16 @@ def upload_index(dav: WebDAVClient, posts: list[dict], cfg: dict):
     ok = dav.put(f"{blog_path}/search/index.html", search_html)
     status = "✓" if ok else "✗"
     print(f"  {status} Search page")
+
+    # RSS feed
+    rss_xml = render_rss(posts, cfg)
+    ok = dav.session.put(
+        dav._url(f"{blog_path}/feed.xml"),
+        data=rss_xml.encode("utf-8"),
+        headers={"Content-Type": "application/rss+xml; charset=utf-8"},
+    ).status_code in (200, 201, 204)
+    status = "✓" if ok else "✗"
+    print(f"  {status} RSS feed → {cfg['base_url']}feed.xml")
 
 
 # ─────────────────────────────────────────

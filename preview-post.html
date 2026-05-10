@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My First Post · Test Blog</title>
+  <meta name="description" content="A brief introduction to what this blog is about." />
+  <meta name="author" content="Paulo" />
+  <link rel="canonical" href="https://example.com/blog/my-first-post/" />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e4e6f0;
+      --muted: #7a7d8e;
+      --accent: #7c9ef8;
+      --accent-hover: #a5bbff;
+      --code-bg: #141720;
+      --tag-bg: #1e2235;
+      --font-body: 'Georgia', 'Times New Roman', serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --font-ui: system-ui, -apple-system, sans-serif;
+      --max-w: 720px;
+      --radius: 4px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 18px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .site-name {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .site-name:hover { color: var(--accent-hover); }
+
+    .site-tagline {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Main ───────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: var(--max-w);
+      width: 100%;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    /* ── Post list (index) ───────────────────── */
+    .post-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .post-list li {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 0;
+    }
+
+    .post-list li:first-child { border-top: 1px solid var(--border); }
+
+    .post-list a {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .post-list a:hover { color: var(--accent-hover); }
+
+    .post-list .meta {
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .post-list .desc {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ── Tags ───────────────────────────────── */
+    .tag {
+      background: var(--tag-bg);
+      color: var(--muted);
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      padding: 0.15em 0.55em;
+      border-radius: var(--radius);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Post article ───────────────────────── */
+    .post-header { margin-bottom: 2.5rem; }
+
+    .post-header h1 {
+      font-family: var(--font-ui);
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Prose ──────────────────────────────── */
+    .post-body { max-width: 66ch; }
+
+    .post-body h2, .post-body h3, .post-body h4 {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    .post-body h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    .post-body h3 { font-size: 1.15rem; }
+    .post-body h4 { font-size: 1rem; color: var(--muted); }
+
+    .post-body p { margin: 1rem 0; }
+
+    .post-body a { color: var(--accent); text-underline-offset: 3px; }
+    .post-body a:hover { color: var(--accent-hover); }
+
+    .post-body ul, .post-body ol {
+      padding-left: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .post-body li { margin: 0.3rem 0; }
+
+    .post-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 0 0.5rem 1.25rem;
+      margin: 1.5rem 0;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .post-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+
+    .post-body th, .post-body td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    .post-body th {
+      background: var(--surface);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .post-body tr:nth-child(even) td { background: var(--surface); }
+
+    .post-body code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--code-bg);
+      padding: 0.1em 0.4em;
+      border-radius: var(--radius);
+      color: #c9d1f5;
+    }
+
+    .post-body pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    .post-body pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.83rem;
+      line-height: 1.6;
+    }
+
+    .post-body img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      margin: 1.5rem 0;
+    }
+
+    .post-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── Post nav ───────────────────────────── */
+    .post-nav {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+    }
+
+    .post-nav a { color: var(--accent); text-decoration: none; }
+    .post-nav a:hover { color: var(--accent-hover); }
+
+    /* ── Footer ─────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── Responsive ─────────────────────────── */
+    @media (max-width: 600px) {
+      main { padding: 2rem 1.25rem 3rem; }
+      .site-header { padding: 1rem 1.25rem; }
+      .post-header h1 { font-size: 1.5rem; }
+    }
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="../" class="site-name">Test Blog</a>
+  </header>
+
+  <main>
+    <article>
+      <header class="post-header">
+        <h1>My First Post</h1>
+        <div class="post-meta">
+          <time datetime="2026-05-06">May 06, 2026</time>
+          <span class="tag">writing</span> <span class="tag">meta</span>
+        </div>
+      </header>
+      <div class="post-body">
+<h2 id="hello">Hello<a class="headerlink" href="#hello" title="Permanent link">&para;</a></h2>
+<p>This is how you write a post. The YAML block at the top (the <em>frontmatter</em>) controls metadata. Everything below the second <code>---</code> is your content, written in standard Markdown.</p>
+<h2 id="code-works-out-of-the-box">Code works out of the box<a class="headerlink" href="#code-works-out-of-the-box" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">!&quot;</span>
+</code></pre></div>
+
+<h2 id="tables-too">Tables too<a class="headerlink" href="#tables-too" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Use case</th>
+<th>Auth method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JMAP</td>
+<td>Email, contacts</td>
+<td>Bearer token</td>
+</tr>
+<tr>
+<td>WebDAV</td>
+<td>File storage</td>
+<td>App password</td>
+</tr>
+<tr>
+<td>CalDAV</td>
+<td>Calendars</td>
+<td>App password</td>
+</tr>
+</tbody>
+</table>
+<h2 id="frontmatter-reference">Frontmatter reference<a class="headerlink" href="#frontmatter-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title</code></td>
+<td>No</td>
+<td>Derived from filename</td>
+<td></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>No</td>
+<td>Today (UTC)</td>
+<td>Format: <code>YYYY-MM-DD</code></td>
+</tr>
+<tr>
+<td><code>slug</code></td>
+<td>No</td>
+<td>Slugified title</td>
+<td>URL path component</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>No</td>
+<td>Empty</td>
+<td>Shown in index listing</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>No</td>
+<td><code>[]</code></td>
+<td>List or comma-separated string</td>
+</tr>
+</tbody>
+</table>
+      </div>
+    </article>
+    <nav class="post-nav">
+      <a href="../">← All posts</a>
+    </nav>
+  </main>
+
+  <footer>
+    <p>© 2026 Paulo</p>
+  </footer>
+</body>
+</html>

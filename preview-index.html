@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Blog</title>
+  <meta name="description" content="A blog about things." />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e4e6f0;
+      --muted: #7a7d8e;
+      --accent: #7c9ef8;
+      --accent-hover: #a5bbff;
+      --code-bg: #141720;
+      --tag-bg: #1e2235;
+      --font-body: 'Georgia', 'Times New Roman', serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --font-ui: system-ui, -apple-system, sans-serif;
+      --max-w: 720px;
+      --radius: 4px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 18px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .site-name {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .site-name:hover { color: var(--accent-hover); }
+
+    .site-tagline {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Main ───────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: var(--max-w);
+      width: 100%;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    /* ── Post list (index) ───────────────────── */
+    .post-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .post-list li {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 0;
+    }
+
+    .post-list li:first-child { border-top: 1px solid var(--border); }
+
+    .post-list a {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--text);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .post-list a:hover { color: var(--accent-hover); }
+
+    .post-list .meta {
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .post-list .desc {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ── Tags ───────────────────────────────── */
+    .tag {
+      background: var(--tag-bg);
+      color: var(--muted);
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      padding: 0.15em 0.55em;
+      border-radius: var(--radius);
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Post article ───────────────────────── */
+    .post-header { margin-bottom: 2.5rem; }
+
+    .post-header h1 {
+      font-family: var(--font-ui);
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── Prose ──────────────────────────────── */
+    .post-body { max-width: 66ch; }
+
+    .post-body h2, .post-body h3, .post-body h4 {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    .post-body h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    .post-body h3 { font-size: 1.15rem; }
+    .post-body h4 { font-size: 1rem; color: var(--muted); }
+
+    .post-body p { margin: 1rem 0; }
+
+    .post-body a { color: var(--accent); text-underline-offset: 3px; }
+    .post-body a:hover { color: var(--accent-hover); }
+
+    .post-body ul, .post-body ol {
+      padding-left: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .post-body li { margin: 0.3rem 0; }
+
+    .post-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 0 0.5rem 1.25rem;
+      margin: 1.5rem 0;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .post-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+
+    .post-body th, .post-body td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    .post-body th {
+      background: var(--surface);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .post-body tr:nth-child(even) td { background: var(--surface); }
+
+    .post-body code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      background: var(--code-bg);
+      padding: 0.1em 0.4em;
+      border-radius: var(--radius);
+      color: #c9d1f5;
+    }
+
+    .post-body pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    .post-body pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.83rem;
+      line-height: 1.6;
+    }
+
+    .post-body img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      margin: 1.5rem 0;
+    }
+
+    .post-body hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* ── Post nav ───────────────────────────── */
+    .post-nav {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+    }
+
+    .post-nav a { color: var(--accent); text-decoration: none; }
+    .post-nav a:hover { color: var(--accent-hover); }
+
+    /* ── Footer ─────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── Responsive ─────────────────────────── */
+    @media (max-width: 600px) {
+      main { padding: 2rem 1.25rem 3rem; }
+      .site-header { padding: 1rem 1.25rem; }
+      .post-header h1 { font-size: 1.5rem; }
+    }
+
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <span class="site-name">Test Blog</span>
+    <span class="site-tagline">A blog about things.</span>
+  </header>
+
+  <main>
+    <ol class="post-list">
+      <li>
+        <a href="my-first-post/">My First Post</a>
+        <div class="meta"><time>May 06, 2026</time><span class="tag">writing</span> <span class="tag">meta</span></div>
+        <p class="desc">A brief introduction to what this blog is about.</p>
+      </li>
+    </ol>
+  </main>
+
+  <footer>
+    <p>© 2026 Paulo</p>
+  </footer>
+</body>
+</html>

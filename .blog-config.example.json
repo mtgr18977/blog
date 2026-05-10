@@ -1,0 +1,11 @@
+{
+  "webdav_base_url": "https://myfiles.fastmail.com/",
+  "webdav_username": "your@email.com",
+  "webdav_app_password": "YOUR_APP_PASSWORD",
+  "blog_path": "blog/",
+  "site_title": "Your Blog Title",
+  "site_description": "Your blog description",
+  "author": "Your Name",
+  "base_url": "https://yourdomain.com/blog/",
+  "posts_per_page": 10
+}

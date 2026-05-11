@@ -13,8 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import Flask, request, render_template_string, redirect, url_for, flash, session
-import yaml
-import markdown
+from flask_wtf.csrf import CSRFProtect
+import bleach
 
 # Import functions from publish.py
 sys.path.insert(0, str(Path(__file__).parent))
@@ -34,6 +34,9 @@ if not os.environ.get("SECRET_KEY"):
         "Then export it: export SECRET_KEY='<your-key>'"
     )
 app.secret_key = os.environ["SECRET_KEY"]
+
+# Enable CSRF protection for all forms
+csrf = CSRFProtect(app)
 
 # ─────────────────────────────────────────
 # HTML Templates
@@ -417,9 +420,14 @@ CONFIG_TEMPLATE = """
     
     <div class="form-group">
         <label for="webdav_app_password">WebDAV App Password</label>
-        <input type="password" id="webdav_app_password" name="webdav_app_password" 
-               value="{{ config.webdav_app_password if config else '' }}" required>
+        <input type="password" id="webdav_app_password" name="webdav_app_password"
+               value="" autocomplete="off" required>
         <div class="help-text">Senha de aplicativo gerada em Fastmail → Settings → Privacy & Security</div>
+        {% if config and config.webdav_app_password %}
+        <div class="help-text" style="color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem;">
+            ✓ Senha já configurada (não exibida por segurança)
+        </div>
+        {% endif %}
     </div>
     
     <div class="form-group">
@@ -525,8 +533,11 @@ def load_config() -> dict:
 
 
 def save_config_file(cfg: dict):
+    import stat
     with open(CONFIG_FILE, "w") as f:
         json.dump(cfg, f, indent=2)
+    # Set file permissions to 600 (owner read/write only) for security
+    os.chmod(CONFIG_FILE, stat.S_IRUSR | stat.S_IWUSR)
 
 
 @app.route("/")
@@ -636,23 +647,46 @@ def publish():
     
     return redirect(url_for("index"))
 
-
 @app.route("/api/preview", methods=["POST"])
 def preview():
     data = request.get_json()
-    markdown_content = data.get("markdown", "")
+    if not data:
+        return {"html": "<p>Dados inválidos.</p>"}
     
+    markdown_content = data.get("markdown", "")
+
     if not markdown_content.strip():
         return {"html": "<p>Nenhum conteúdo fornecido.</p>"}
-    
+
     try:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as f:
             f.write(markdown_content)
             temp_path = Path(f.name)
-        
+
         try:
             _, html_body = parse_markdown(temp_path)
-            return {"html": html_body}
+            # Sanitize HTML to prevent XSS
+            clean_html = bleach.clean(
+                html_body,
+                tags=[
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'p', 'br', 'hr',
+                    'strong', 'em', 'b', 'i', 'u', 's', 'strike',
+                    'a', 'ul', 'ol', 'li',
+                    'blockquote', 'pre', 'code',
+                    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                    'img', 'figure', 'figcaption'
+                ],
+                attributes={
+                    'a': ['href', 'title', 'target', 'rel'],
+                    'img': ['src', 'alt', 'title'],
+                    'code': ['class'],
+                    'pre': ['class']
+                },
+                protocols=['http', 'https'],
+                strip=True
+            )
+            return {"html": clean_html}
         finally:
             temp_path.unlink(missing_ok=True)
     except Exception as e:
@@ -723,7 +757,12 @@ def rebuild_index():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+    # SECURITY: Debug mode defaults to False for production safety
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    if debug:
+        print("WARNING: Debug mode is ENABLED. Do not use in production!")
     print(f"Starting Blog Publisher Web Interface on http://localhost:{port}")
     print("Configure your Fastmail credentials at /config first.")
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    # SECURITY: Only bind to localhost unless explicitly configured
+    host = os.environ.get("FLASK_HOST", "127.0.0.1")
+    app.run(host=host, port=port, debug=debug)

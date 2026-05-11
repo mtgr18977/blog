@@ -328,6 +328,7 @@ INDEX_TEMPLATE = """
 {% block title %}Publicar Post - Blog Publisher{% endblock %}
 {% block content %}
 <form method="POST" action="{{ url_for('publish') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="markdown">Conteúdo Markdown</label>
         <textarea id="markdown" name="markdown" placeholder="Cole seu arquivo markdown aqui...
@@ -404,6 +405,7 @@ CONFIG_TEMPLATE = """
 </div>
 
 <form method="POST" action="{{ url_for('save_config') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="webdav_base_url">WebDAV Base URL</label>
         <input type="text" id="webdav_base_url" name="webdav_base_url" 
@@ -499,6 +501,7 @@ LIST_TEMPLATE = """
             <td>{{ post.title }}</td>
             <td>
                 <form method="POST" action="{{ url_for('delete_post') }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja deletar este post?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="slug" value="{{ post.slug }}">
                     <button type="submit" class="secondary" style="padding: 0.4em 0.8em; font-size: 0.7rem;">🗑️ Deletar</button>
                 </form>
@@ -519,7 +522,19 @@ LIST_TEMPLATE = """
 {% endblock %}
 """
 
-app.jinja_env.from_string(BASE_TEMPLATE)
+# FIX: Remove the useless line that was here (app.jinja_env.from_string(BASE_TEMPLATE))
+# and add a proper loader so that 'extends "base"' works correctly.
+
+from jinja2 import BaseLoader, TemplateNotFound
+
+class StringLoader(BaseLoader):
+    """Allows 'base' to be used as an extends target."""
+    def get_source(self, environment, template):
+        if template == 'base':
+            return BASE_TEMPLATE, None, lambda: True
+        raise TemplateNotFound(template)
+
+app.jinja_loader = StringLoader()
 
 
 def load_config() -> dict:
@@ -540,9 +555,11 @@ def save_config_file(cfg: dict):
     os.chmod(CONFIG_FILE, stat.S_IRUSR | stat.S_IWUSR)
 
 
+# FIX: Routes now use normal inheritance without manual .replace()
+
 @app.route("/")
 def index():
-    return render_template_string(INDEX_TEMPLATE.replace('{% extends "base" %}', BASE_TEMPLATE))
+    return render_template_string(INDEX_TEMPLATE)
 
 
 @app.route("/config")
@@ -550,7 +567,7 @@ def config_page():
     cfg = load_config()
     config_exists = CONFIG_FILE.exists()
     return render_template_string(
-        CONFIG_TEMPLATE.replace('{% extends "base" %}', BASE_TEMPLATE),
+        CONFIG_TEMPLATE,
         config=cfg if config_exists else None,
         config_exists=config_exists
     )
@@ -648,6 +665,7 @@ def publish():
     return redirect(url_for("index"))
 
 @app.route("/api/preview", methods=["POST"])
+@csrf.exempt
 def preview():
     data = request.get_json()
     if not data:
@@ -696,10 +714,7 @@ def preview():
 @app.route("/posts")
 def list_posts():
     posts = load_registry()
-    return render_template_string(
-        LIST_TEMPLATE.replace('{% extends "base" %}', BASE_TEMPLATE),
-        posts=posts
-    )
+    return render_template_string(LIST_TEMPLATE, posts=posts)
 
 
 @app.route("/posts/delete", methods=["POST"])

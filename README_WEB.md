@@ -63,8 +63,31 @@ A data também pode ser extraída automaticamente se estiver no corpo do texto n
 
 ## Variáveis de Ambiente
 
+### SECRET_KEY (Obrigatório)
+
+⚠️ **Importante**: A `SECRET_KEY` deve ser definida via variável de ambiente. Nunca use valores padrão em produção!
+
+Para gerar uma chave segura:
+
+```bash
+python -c 'import secrets; print(secrets.token_hex(32))'
+```
+
+Exporte a chave:
+
+```bash
+export SECRET_KEY='sua-chave-gerada-aqui'
+```
+
+Ou crie um arquivo `.env`:
+
+```bash
+SECRET_KEY=sua-chave-gerada-aqui
+```
+
+### Outras Variáveis
+
 - `PORT`: Porta para rodar a aplicação (padrão: 5000)
-- `SECRET_KEY`: Chave secreta para sessões Flask (padrão: "dev-key-change-in-production")
 - `FLASK_DEBUG`: Habilita modo debug (padrão: true)
 
 ## Exemplo com Docker

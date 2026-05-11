@@ -1,5 +1,11 @@
 # fastmail-blog
 
+> \[!NOTE]
+> 
+> For the PTBR version, access the [README.pt.md](https://github.com/mtgr18977/blog/blob/master/README.pt.md).
+> 
+> For the webv version (using `flask`) access the [README_WEB.md](https://github.com/mtgr18977/blog/blob/master/README_WEB.md) version.
+
 A minimal static blog system that publishes Markdown posts directly to **Fastmail Files** via WebDAV. No build step, no server, no framework — just Python and your writing.
 
 ---

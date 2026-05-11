@@ -25,7 +25,15 @@ from publish import (
 )
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-key-change-in-production")
+
+# SECRET_KEY must be set via environment variable - never hardcode secrets!
+if not os.environ.get("SECRET_KEY"):
+    raise RuntimeError(
+        "SECRET_KEY environment variable is required. \"
+        "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))' \"
+        "Then export it: export SECRET_KEY='<your-key>'"
+    )
+app.secret_key = os.environ["SECRET_KEY"]
 
 # ─────────────────────────────────────────
 # HTML Templates

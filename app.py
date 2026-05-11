@@ -29,8 +29,8 @@ app = Flask(__name__)
 # SECRET_KEY must be set via environment variable - never hardcode secrets!
 if not os.environ.get("SECRET_KEY"):
     raise RuntimeError(
-        "SECRET_KEY environment variable is required. \"
-        "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))' \"
+        "SECRET_KEY environment variable is required. "
+        "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))' "
         "Then export it: export SECRET_KEY='<your-key>'"
     )
 app.secret_key = os.environ["SECRET_KEY"]

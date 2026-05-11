@@ -1,4 +1,12 @@
 ```
 __pycache__/
 *.pyc
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Config files with credentials
+.blog-config.json
 ```

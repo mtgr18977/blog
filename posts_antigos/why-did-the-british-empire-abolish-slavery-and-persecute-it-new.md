@@ -1,5 +1,6 @@
 ---
 title: Why did the british empire abolish slavery and persecute it?
+slug: why-did-the-british-empire-abolish-slavery-and-persecute-it-new
 date: 2026-05-06
 source: https://herebedragons.com.br/why-did-the-british-empire-abolish-slavery-and-persecute-it-new/
 description: ""

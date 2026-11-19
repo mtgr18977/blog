@@ -117,6 +117,21 @@ python publish.py --delete slug-do-post
 
 ---
 
+## Publicar no Netlify
+
+O `build.py` transforma todos os posts de `posts_antigos/` e `posts_novos/` em um site estático em `dist/`. Ele só precisa de `markdown` e `pyyaml`.
+
+```bash
+pip install -r requirements-build.txt
+python build.py                      # gera dist/
+python -m http.server -d dist        # prévia em http://localhost:8000
+```
+
+- **Post novo:** crie um `.md` em `posts_novos/` com `title`, `date` e, se quiser, `slug`, `description`, `tags`, `source` e `lang`. Sem `slug`, ele é gerado a partir do título. Se dois posts gerarem o mesmo slug, o build para e lista os arquivos.
+- **Posts antigos:** se o corpo tiver uma linha como `_ 12 May, 2025 _`, essa data vale no lugar da do frontmatter e a linha some da página.
+- **Configuração do site** (nome, descrição, autor, URL base e idioma) fica no `site.json`.
+- **Deploy:** conecte o repositório no Netlify. O `netlify.toml` já define o comando de build e a pasta `dist`, então cada push na branch principal reconstrói e publica o site.
+
 ## Importando posts existentes
 
 O `scrap_blog.py` faz scraping de um blog existente e salva cada post como arquivo Markdown compatível com o `publish.py`:

@@ -1,5 +1,6 @@
 ---
 title: Verbalize 0.1
+slug: verbalize-en
 date: 2026-05-06
 source: https://herebedragons.com.br/verbalize-en/
 description: ""

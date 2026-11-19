@@ -1,0 +1,20 @@
+[build]
+  command = "pip install -r requirements-build.txt && python build.py"
+  publish = "dist"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+# CSS é referenciado com ?v=<hash>, então pode ficar em cache por 1 ano.
+[[headers]]
+  for = "/style.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML, feed e sitemap: o Netlify já serve com max-age=0, must-revalidate (sem cache longo).
+
+# Página de erro. Só vale quando nenhum arquivo bate com a URL.
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404

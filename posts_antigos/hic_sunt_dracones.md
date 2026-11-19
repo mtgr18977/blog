@@ -1,5 +1,6 @@
 ---
 title: Brincando com dados - prevendo o campeonato
+slug: hic-sunt-dracones
 date: 2026-05-06
 source: https://herebedragons.com.br/brincando-com-dados-prevendo-o-campeonato/
 description: ""

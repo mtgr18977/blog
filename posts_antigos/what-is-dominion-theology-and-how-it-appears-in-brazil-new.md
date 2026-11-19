@@ -1,5 +1,6 @@
 ---
 title: What is dominion theology? And how it appears in Brazil.
+slug: what-is-dominion-theology-and-how-it-appears-in-brazil-new
 date: 2026-05-06
 source: https://herebedragons.com.br/what-is-dominion-theology-and-how-it-appears-in-brazil-new/
 description: ""
